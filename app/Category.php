@@ -13,9 +13,6 @@ class Category extends Model
 
     protected $fillable = ['name', 'description', 'slug'];
 
-    /**
-     * Get the options for generating the slug.
-     */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
