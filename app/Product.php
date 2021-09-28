@@ -19,6 +19,12 @@ class Product extends Model
             ->saveSlugsTo('slug');
     }
 
+    //product->thumb->getThumbAttribute
+    public function getThumbAttribute()
+    {
+        return $this->photos->first()->image;
+    }
+
     public function store()
     {
         return $this->belongsTo(Store::class);

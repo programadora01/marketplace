@@ -1,6 +1,5 @@
 @extends('layouts.front')
 
-
 @section('content')
 
 <div class="row front">
@@ -10,7 +9,7 @@
         <div class="card" style="width: 100%;">
 
             @if($product->photos->count())
-            <img src="{{asset('storage/' . $product->photos->first()->image)}}" alt="" class="card-img-top">
+            <img src="{{asset('storage/' . $product->thumb)}}" alt="" class="card-img-top">
             @else
             <img src="{{asset('assets/img/no-photo.jpg')}}" alt="" class="card-img-top">
             @endif

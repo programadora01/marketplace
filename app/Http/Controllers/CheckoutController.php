@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Payment\PagSeguro\CreditCard;
+use App\Payment\PagSeguro\Notification;
 use Illuminate\Http\Request;
 use App\User;
 use App\Store;
 use PhpParser\Node\Stmt\TryCatch;
+use Ramsey\Uuid\Uuid;
+use App\UserOrders;
+
 
 class CheckoutController extends Controller
 {
@@ -48,27 +52,26 @@ class CheckoutController extends Controller
             $user = auth()->user();
             $cartItems = session()->get('cart');
             $stores = array_unique(array_column($cartItems, 'store_id'));
-            $reference = 'XPTO';
-
+            $reference = Uuid::uuid4();
 
             $creditCardPayment = new CreditCard($cartItems, $user, $dataPost, $reference);
             $result = $creditCardPayment->doPayment();
-
-
 
             $userOrder = [
                 'reference' => $reference,
                 'pagseguro_code' => $result->getCode(),
                 'pagseguro_status' => $result->getStatus(),
                 'items' => serialize($cartItems),
-                'store_id' => 50
-
 
             ];
 
             $userOrder = $user->orders()->create($userOrder);
 
             $userOrder->stores()->sync($stores);
+
+            //notificar loja de novo pedido
+            $store = (new Store())->notifyStoreOwners($stores);
+
 
             session()->forget('cart');
             session()->forget('pagseguro_session_code');
@@ -83,7 +86,7 @@ class CheckoutController extends Controller
             ]);
         } catch (\Exception $e) {
 
-            $message = env('APP_DEBUG') ? $e->getMessage() : 'Erro ao processar pedido!';
+            $message = env('APP_DEBUG') ? simplexml_load_string($e->getMessage()) : 'Erro ao processar pedido!';
 
             return response()->json([
 
@@ -103,6 +106,36 @@ class CheckoutController extends Controller
         return view('thanks');
     }
 
+    public function notification()
+    {
+        try {
+            $notification = new Notification();
+            $notification = $notification->getTransaction();
+
+            $reference = base64_decode($notification->getReference());
+            //dd($reference);
+            //exit;
+
+            //Atualizar o pedido do usuário
+            $userOrder = UserOrders::whereReference($reference);
+            $userOrder->update([
+                'pagseguro_status' => $notification->getStatus()
+            ]);
+
+            //Comentários sobre o pedido de pagamento
+
+            if ($notification->getStatus() == 3) {
+                //Liberar o pedido do usuário..., Atuatlizar o status do pedido para em separação
+                //Notificacar o usuário que o pedido foi pago...
+                //Notificar a loja da confirmação do pedido...
+            }
+            return response()->json([], 204);
+        } catch (\Exception $e) {
+
+            $message = env('APP_DEBUG') ? $e->getMessage() : '';
+            return response()->json(['error' => $message], 500);
+        }
+    }
 
     private function makePagSeguroSession()
     {

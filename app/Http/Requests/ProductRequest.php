@@ -13,8 +13,8 @@ class ProductRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;  
-    } 
+        return true;
+    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -25,13 +25,12 @@ class ProductRequest extends FormRequest
     {
         return [
             'name'        => 'required',
-            'description' => 'required|min:30',
+            'description' => 'required|min:30|max:150',
             'body'        => 'required',
             'price'       => 'required',
             'photos.*'      => 'image'
 
         ];
-        
     }
 
     public function messages()

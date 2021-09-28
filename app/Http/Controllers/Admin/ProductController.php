@@ -27,8 +27,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $userStore = auth()->user()->store;
-        $products = $userStore->products()->paginate(10);
+        $user = auth()->user();
+
+        if (!$user->store()->exists()) {
+
+            flash('É preciso criar uma loja para cadastrar produtos!')->warning();
+            return redirect()->route('admin.stores.index');
+        }
+
+        $products = $user->store->products()->paginate(10);
 
         return view('admin.products.index', compact('products'));
     }
@@ -56,6 +63,10 @@ class ProductController extends Controller
 
         $data = $request->all();
         $categories = $request->get('categories', null);
+
+        $data['price'] = formatPriceToDatabase($data['price']);
+
+        //dd($data['price']);
 
         $store = auth()->user()->store;
         $product = $store->products()->create($data);
@@ -113,6 +124,7 @@ class ProductController extends Controller
     {
         $data = $request->all();
         $categories = $request->get('categories', null);
+        $data['price'] = formatPriceToDatabase($data['price']);
 
         $product = $this->product->find($product);
 

@@ -34,12 +34,12 @@ class StoreController extends Controller
 
     /**
      * Normalmente 403 é quando você não PODE acessar a url ou porque tem algo errado ou porque vc não tem permissão
-     * vou te mostrar como estava 
-     * cadastrando normalmente. colocou aquele tal de StoreRequest e babou tudo que seria o arquivo 
-     * 
-     * funcionou 
-     * 
-     * 
+     * vou te mostrar como estava
+     * cadastrando normalmente. colocou aquele tal de StoreRequest e babou tudo que seria o arquivo
+     *
+     * funcionou
+     *
+     *
      *
      * @param StoreRequest $request
      * @return void

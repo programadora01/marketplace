@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace L6</title>
     <link rel="stylesheet" href="{{asset('css/app.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -42,11 +43,17 @@
                     <ul class="navbar-nav mr-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); document.querySelector('form.logout').submit(); ">Sair</a>
+                            <a href="{{route('admin.notifications.index')}}" class="nav-link">
+                                <span class="badge badge-danger">{{auth()->user()->unreadNotifications->count()}}</span>
+                                <i class="fa fa-bell"></i>
+                            </a>
+                        </li>
 
+                        <li class="nav-item">
                             <form action="{{route('logout')}}" class="logout" method="POST" style="display:none;">
                                 @csrf
                             </form>
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); document.querySelector('form.logout').submit(); ">Sair</a>
 
                         </li>
                         <li class="nav-item">
@@ -63,9 +70,9 @@
         @include('flash::message')
         @yield('content')
     </div>
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="{{asset('js/app.js')}}"></script>
 
+    <script src="{{asset('js/app.js')}}"></script>
+    @yield('scripts')
 </body>
 
 </html>

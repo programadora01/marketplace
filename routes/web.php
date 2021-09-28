@@ -36,6 +36,8 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', 'CheckoutController@index')->name('index');
     Route::post('/proccess', 'CheckoutController@proccess')->name('proccess');
     Route::get('/thanks', 'CheckoutController@thanks')->name('thanks');
+
+    Route::post('/notification', 'CheckoutController@notification')->name('notification');
 });
 
 
@@ -52,9 +54,9 @@ Route::get('/model', function () {
     //dd($user);
 
     // Mass Update
-    //\App\User::All() - retorna todos os usuários 
+    //\App\User::All() - retorna todos os usuários
     //\App\User::find(3) - retorna o usuário com base no id
-    //\App\User::where('name', 'Caroline Abernathy')->first() - Retorna o usuário conforme dado inserido na 
+    //\App\User::where('name', 'Caroline Abernathy')->first() - Retorna o usuário conforme dado inserido na
     //select * from users where name 'Caroline Abernathy'
 
     //$user = \App\User::find(43);
@@ -64,7 +66,7 @@ Route::get('/model', function () {
     //]); //true ou false
     //dd($user);
 
-    //Active Record   
+    //Active Record
     //$products = \App\Product::all(); //select * from products
 
     //$user = new \App\User();
@@ -81,11 +83,11 @@ Route::get('/model', function () {
     //Como eu faria para pegar a loja de um usuáario
     //$user = \App\User::find(4);
 
-    //return $user->store; //quando for 1:1 vai retorno o objeto único (store) 1:N Vai retornar uma collection de dados (objetos da alegação) 
+    //return $user->store; //quando for 1:1 vai retorno o objeto único (store) 1:N Vai retornar uma collection de dados (objetos da alegação)
 
     //dd($user->store()->count()); //O objeto único o (store) se for  Collection de Dados(Objetos)
 
-    //pegar os produtos da loja 
+    //pegar os produtos da loja
     //$loja = \App\Store::find(1);
     //return $loja->products->count(); $loja->products()->where('id', 9)->get();
 
@@ -111,7 +113,7 @@ Route::get('/model', function () {
     //    'description' => 'CORE I5 10GB',
     //    'body' => 'Qualquer coisa...',
     //    'price' => 2999.90,
-    //    'slug' => 'notebook-dell',   
+    //    'slug' => 'notebook-dell',
     //]);
     //dd($product);
 
@@ -130,12 +132,12 @@ Route::get('/model', function () {
 
     //Adicionar um produto para uma categoria ou vice-versa
     //$product = \App\Product::find(42);
-    //dd($product->categories()->sync([2]));//adiciona categoria 
+    //dd($product->categories()->sync([2]));//adiciona categoria
     //dd$product->categories()->detach([]);remove categoria
     //dd($product->categories()->sync([1,2])); sync permite adicionar categoria remover uma dela sem mexer na outra e vice-versa
     $product = \App\Product::find(42);
     return $product->categories;
-    //return \App\User::all(); 
+    //return \App\User::all();
 
 
 
@@ -150,11 +152,16 @@ Route::get('/model', function () {
 //Route::delete - remoção de dados
 //Route::options - retorna quais cabeçalho aquela rota específica responde
 
-Route::group(['middleware' => ['auth']], function () {
+Route::get('my-orders', 'UserOrderController@index')->name('user.orders')->middleware('auth');
 
-    Route::get('my-orders', 'UserOrderController@index')->name('user.orders');
+Route::group(['middleware' => ['auth', 'access.control.store.admin']], function () {
+
 
     Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function () {
+
+        Route::get('notifications', 'NotificationController@notifications')->name('notifications.index');
+        Route::get('notifications/read-all', 'NotificationController@readAll')->name('notifications.read.all');
+        Route::get('notifications/read/{notification}', 'NotificationController@read')->name('notifications.read');
 
         //Route::prefix('stores')->name('stores.')->group(function(){
 
@@ -167,6 +174,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         //});
 
+        Route::resource('onwers', 'OnwersController');
+
         Route::resource('stores', 'StoreController');
         Route::resource('products', 'ProductController');
         Route::resource('categories', 'CategoryController');
@@ -177,6 +186,31 @@ Route::group(['middleware' => ['auth']], function () {
     });
 });
 
+//Route::get("enviando", 'MailTestController@index');
+//Route::get("sms", 'MailTestController@sms');
+
 Auth::routes();
 
-//Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');//middleware('auth');
+Route::get('/model', function () {
+}
+    //$product = \App\Product::find(53);
+
+    //return $product->categories;
+
+);
+
+
+Route::get('not', function () {
+
+    //$user->notify(new \App\Notifications\StoreReceiveNewOrder());
+
+    //$notification = $user->notifications->first();
+    //$notification->markAsRead();
+
+    //return $user->notifications; -> Exibe as notificções
+    //return $user->unreadNotifications; -> Exibe somente as notificações não lidas
+    //return $user->readNotifications->count();  -> Exibe a quantidade de notificações lidas, ou seja colocando o método count() aparece a quantidade de notificações seja lidas ou não lidas.
+
+
+});
