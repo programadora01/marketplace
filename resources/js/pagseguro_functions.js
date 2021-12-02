@@ -1,15 +1,21 @@
-const {
-    divide
-} = require("lodash");
+//const {
+//    divide
+//} = require("lodash");
 
-function proccessPayment(token, buttonTarget) {
+function proccessPayment(token, paymentType) {
     let data = {
-        card_token: token,
         hash: PagSeguroDirectPayment.getSenderHash(),
-        installment: document.querySelector('select.select_installments').value,
-        card_name: document.querySelector('input[name=card_name]').value,
+        paymentType: paymentType,
         _token: csrf
     };
+
+    if (paymentType === 'CREDITCARD') {
+        //aqui coloco os dados a serem enviados e necessários para pagemnto com cartão
+        data.card_token = token;
+        data.installment = document.querySelector('select.select_installments').value;
+        data.card_name = document.querySelector('input[name=card_name]').value;
+
+    }
 
     $.ajax({
         type: 'POST',
@@ -17,16 +23,19 @@ function proccessPayment(token, buttonTarget) {
         data: data,
         dataType: 'json',
         success: function (res) {
-            toastr.success(res.data.message, 'Sucesso');
-            window.location.href = `${urlThanks}?order=${res.data.order}`;
-        },
-        error: function (err) {
-            buttonTarget.disabled = false;
-            buttonTarget.innerHTML = 'Efetuar Pagamento';
+            let redirectUrl = `${urlThanks}?order=${res.data.order}`; //127.0.0.1:8000/checkout/thanks?order=21212
+            let linkBoleto = `${redirectUrl}&b=${res.data.link_boleto}`; //127.0.0.1:8000/checkout/thanks?order=21212&b=lin-boleto
 
-            let message = JSON.parse(err.responseText);
-            document.querySelector('div.msg').innerHTML = showErrorMessages(message.data.message.error.message);
+            toastr.success(res.data.message, 'Sucesso');
+            window.location.href = paymentType === 'BOLETO' ? linkBoleto : redirectUrl;
         }
+        //error: function (err) {
+        //    buttonTarget.disabled = false;
+        //    buttonTarget.innerHTML = 'Efetuar Pagamento';
+        //
+        //    let message = JSON.parse(err.responseText);
+        //    document.querySelector('div.msg').innerHTML = showErrorMessages(message.data.message.error.message);
+        //}
 
     });
 }

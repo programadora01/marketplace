@@ -53,7 +53,7 @@ class CreditCard
 
         $creditCard->setSender()->setDocument()->withParameters(
             'CPF',
-            '91604699191'
+            '24400145085'
         );
 
         $creditCard->setSender()->setHash($this->cardInfo['hash']);

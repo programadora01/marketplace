@@ -22,8 +22,6 @@ class OrdersController extends Controller
 
         //dd($orders);
 
-
-
         if (!$user->store()->exists()) {
 
             flash('É preciso criar uma loja para ter pedidos!')->warning();
